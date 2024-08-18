@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Mirror Selector
+Name[zh_CN]=镜像源选择器
+GenericName=Mirror Selector
+GenericName[zh_CN]=镜像源选择器
+Exec=/usr/bin/mirror-selector
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Categories=System;
+Icon=notification_collaboration
