@@ -5,12 +5,13 @@
 #include <QCommandLineParser>
 #include <QStandardPaths>
 #include <QDebug>
+#include <QDir>
 #include <systemd/sd-daemon.h>
 
-static void comment(bool addComment) {
-    QFile file("/etc/apt/sources.list");
+static void comment(const QString filePath, bool addComment) {
+    QFile file(filePath);
 
-    // 检查文件是否能被打开
+           // 检查文件是否能被打开
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "无法打开文件" << file.fileName();
         return;
@@ -19,10 +20,10 @@ static void comment(bool addComment) {
     QStringList lines;
     QTextStream in(&file);
 
-    // 逐行读取文件内容
+           // 逐行读取文件内容
     while (!in.atEnd()) {
         QString line = in.readLine();
-        if (line.contains("https://community-packages.deepin.com/beige")) {
+        if (line.contains("https://community-packages.deepin.com")) {
             if (addComment) {
                 // 如果需要添加注释，且行首没有 '#'
                 if (!line.startsWith("#")) {
@@ -40,7 +41,7 @@ static void comment(bool addComment) {
 
     file.close();
 
-    // 重新写入修改后的内容
+           // 重新写入修改后的内容
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "无法重新打开文件写入内容" << file.fileName();
         return;
@@ -57,7 +58,7 @@ static void comment(bool addComment) {
 void writeToFile(const QString &text) {
     QFile file("/etc/apt/sources.list.d/mirror-selector.tmp.list");
 
-    // 打开文件以写入模式（WriteOnly），清空文件内容（Truncate）
+           // 打开文件以写入模式（WriteOnly），清空文件内容（Truncate）
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         qWarning() << "无法打开文件" << file.fileName() << "进行写入";
         return;
@@ -65,7 +66,7 @@ void writeToFile(const QString &text) {
 
     QTextStream out(&file);
 
-    // 写入新的字符串内容
+           // 写入新的字符串内容
     out << text;
 
     file.close();  // 关闭文件
@@ -89,14 +90,13 @@ int main(int argc, char *argv[])
 
     QString mirror = parser.value(arg);
     if (mirror == "reset") {
-        comment(false);
         QFile file("/etc/apt/sources.list.d/mirror-selector.tmp.list");
         file.remove();
     }
     else {
         QFile file(":/mirror.list");
 
-        // 检查文件是否能被打开
+               // 检查文件是否能被打开
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qWarning() << "无法打开文件" << file.fileName();
             return -1;
@@ -110,13 +110,18 @@ int main(int argc, char *argv[])
             if (!line.isEmpty()) {
                 if (count++ == mirror.toInt()) {
                     writeToFile(QString("deb %1 beige main commercial community").arg(line));
-                    comment(true);
                     break;
                 }
             }
         }
 
         file.close();
+    }
+
+    comment("/etc/apt/sources.list", mirror != "reset");
+    QDir dir("/etc/apt/sources.list.d");
+    for (auto d : dir.entryList(QDir::Filter::Files)) {
+        comment(QString("%1/%2").arg(dir.path()).arg(d), mirror != "reset");
     }
 
     sd_notify(0, "READY=1");

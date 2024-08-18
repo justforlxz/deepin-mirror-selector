@@ -5,12 +5,18 @@
 #include <QDBusInterface>
 #include <QDebug>
 #include <QUrl>
+#include <QLocale>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setWindowTitle(QLocale::system().language() == QLocale::Chinese ? "镜像源选择器" : "Mirror Selector");
+    ui->label->setText(QLocale::system().language() == QLocale::Chinese ? "选择镜像源" : "Select");
+    ui->pushButton->setText(QLocale::system().language() == QLocale::Chinese ? "应用" : "Apply");
+    ui->pushButton_2->setText(QLocale::system().language() == QLocale::Chinese ? "重设" : "Reset");
 
     QFile file(":/mirror.list");
 
