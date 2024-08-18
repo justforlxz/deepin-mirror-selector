@@ -1,0 +1,15 @@
+Source: deepin-mirror-selector
+Section: utils
+Priority: optional
+Maintainer: Deepin Packages Builder <packages@deepin.com>
+Build-Depends: debhelper (>=9), qt6-base-dev, libsystemd-dev
+Standards-Version: 3.9.6
+Homepage: https://www.deepin.org/
+#Vcs-Git: git://anonscm.debian.org/collab-maint/deepin-mirror-selector.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/deepin-mirror-selector.git
+
+Package: deepin-mirror-selector
+Architecture: libdevel
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: deepin simple mirror selector
+ Manual change mirror url

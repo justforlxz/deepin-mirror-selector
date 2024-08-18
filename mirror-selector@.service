@@ -1,0 +1,7 @@
+[Unit]
+Description=change apt mirror
+
+[Service]
+Slice=session.slice
+Type=notify
+ExecStart=/usr/bin/mirror-selector-commander -a %i

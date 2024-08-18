@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>mirror.list</file>
+    </qresource>
+</RCC>
